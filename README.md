@@ -9,7 +9,9 @@ When evaluating a workflow for your team, it's most important that you consider 
 ## Centralized as origin
 The repository setup that we use and that works well with this branching model, is that with a central “truth” repo. We will refer to this repo as **origin**
 
-![Central repo as origin](./images/centr-decentr@2x.png "Central repo as origin")
+```![Central repo as origin](./images/centr-decentr@2x.png "Central repo as origin")
+```
+<img style="float: center;" width="500" src="./images/centr-decentr@2x.png">
 
 Each developer pulls and pushes to origin. But besides the centralized push-pull relationships, each developer may also pull changes from other peers to form sub teams. For example, this might be useful to work together with two or more developers on a big new feature, before pushing the work in progress to origin prematurely. In the figure above, there are subteams of Alice and Bob, Alice and David, and Clair and David.
 
@@ -23,27 +25,33 @@ The main idea behind the Git workflow branching strategy is to isolate your work
 - Release
 - Hotfix
 
-![Git Branching Model](./images/git-model@2x.png "Git Branching Model")
+```![Git Branching Model](./images/git-model@2x.png "Git Branching Model")
+```
+<img style="float: center;" width="500" src="./images/git-model@2x.png">
 
 The two primary branches in Git workflow are master and develop. There are three types of supporting branches with different intended purposes: feature, release, and hotfix.
 
 ### The Primary Branches
 
-![Primary Branches](./images/main-branches@2x.png "Primary Branches are master and develop")
-### Master Branch
+```![Primary Branches](./images/main-branches@2x.png "Primary Branches are master and develop")
+```
+<img style="float: right;" width="200" src="./images/main-branches@2x.png">
+#### Master Branch
 The purpose of the main branch in the Git workflow is to contain **production-ready code** that can be released. Other branches will be merged into the main branch after they have been sufficiently vetted and tested.
 
-### Develop Branch
+#### Develop Branch
 The develop branch is created at the start of a project and is maintained throughout the development process, and contains pre-production code with newly developed features that are in the process of being tested.
 
 Newly-created features should be based off the develop branch, and then merged back in when ready for testing.
 
 ### The Supporting Branches
 #### Feature Branch
+<img style="float: right;" width="200" src="./images/fb@2x.png">
 When working on a new feature, you will start a feature branch off the develop branch, and then merge your changes back into the develop branch when the feature is completed and properly reviewed.
 #### Release Branch
 The release branch should be used when preparing new production releases. Typically, the work being performed on release branches concerns finishing touches and minor bugs specific to releasing new code, with code that should be addressed separately from the main develop branch.
 #### Hotfix Branch
+<img style="float: right;" width="250" src="./images/hotfix-branches@2x.png">
 The hotfix branch is used to quickly address necessary changes in your master branch.
 The base of the hotfix branch should be your main branch and should be merged back into both the main and develop branches. Merging the changes from your hotfix branch back into the develop branch is critical to ensure the fix persists the next time the main branch is released.
 
@@ -177,6 +185,41 @@ git branch -d my-branch-name
 ```
 **NOTE:** The **-d** option only deletes the branch if it has already been merged. The **-D** option is a shortcut for --delete --force, which deletes the branch irrespective of its merged status.
 
+#### Change committer name/email
+1. Fix the git configuration (local)
+```shell
+$ git config --global user.name "Your-name"
+$ git config --global user.email "your@email.com"
+```
+2. 
+*(Option 1)* Use --amend for the Very Last Commit
+```shell
+$ git commit --amend --reset-author
+# Or
+$ git commit --amend --author="Your-name <your@email.com>"
+```
+*(Option 2)* Use git filter-branch for All Ealier Commit, run this the script *[git-filter.sh](./scripts.git-filter.sh)*:
+```shell
+#!/bin/sh
+
+git filter-branch -f --env-filter '
+WRONG_EMAIL="wrong@email.com"
+NEW_NAME="Your-name"
+NEW_EMAIL="your@email.com"
+
+if [ "$GIT_COMMITTER_EMAIL" = "$WRONG_EMAIL" ]
+then
+    export GIT_COMMITTER_NAME="$NEW_NAME"
+    export GIT_COMMITTER_EMAIL="$NEW_EMAIL"
+fi
+if [ "$GIT_AUTHOR_EMAIL" = "$WRONG_EMAIL" ]
+then
+    export GIT_AUTHOR_NAME="$NEW_NAME"
+    export GIT_AUTHOR_EMAIL="$NEW_EMAIL"
+fi
+' --tag-name-filter cat -- --branches --tags
+```
+
 ## Credits
 - [Comparing Workflows](https://www.atlassian.com/git/tutorials/comparing-workflows)
 - [Git Concepts - Quick Start Guides](https://www.gitkraken.com/learn/git/git-flow)
@@ -188,7 +231,6 @@ git branch -d my-branch-name
 
 ## Other Links
 - [x] https://medium.com/20scoops-cnx/github-workflow-from-scratch-99b07e8c318b
-- [x] file locks.
 - [x] https://www.nobledesktop.com/learn/git/git-branches
 - [ ] https://opensource.com/article/20/7/git-best-practices
 - [ ] https://docs.gitlab.com/ee/topics/gitlab_flow.html
