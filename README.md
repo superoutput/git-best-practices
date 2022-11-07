@@ -124,12 +124,12 @@ In body:
 - Related-Bug: #12345678 -- use 'Related-Bug' if the commit is merely related to the referenced bug.
 
 ## For All the Routine Commands
-#### Show the working tree status
+### Show the working tree status
 ```
 git status
 ```
 
-#### List All Branches
+### List All Branches
 - To see **local branches**
 ```
 git branch
@@ -144,24 +144,24 @@ git branch -a
 ```
 **NOTE:** The current local branch will be marked with **(*)**
 
-#### Create a New Branch
+### Create a New Branch
 ```
 git checkout -b my-branch-name
 ```
 **NOTE:** Replacing my-branch-name with whatever name you want
 
-#### Switch to a Branch from Local
+### Switch to a Branch from Local
 ```
 git checkout my-branch-name
 ```
 
-#### Switch to a Branch from Remote
+### Switch to a Branch from Remote
 ```
 git pull
 git checkout --track origin/my-branch-name
 ```
 
-#### Push to a Branch
+### Push to a Branch
 - If your local branch **does not exist** on the remote, run either of these commands
 ```
 git push -u origin my-branch-name
@@ -173,7 +173,7 @@ git push -u origin HEAD
 git push
 ```
 
-#### Merge a Branch
+### Merge a Branch
 1. You'll want to make sure your working tree is clean and see what branch you're on. Run this command
 ```
 git status
@@ -188,7 +188,7 @@ git checkout master
 git merge my-branch-name
 ```
 
-#### Delete Branches
+### Delete Branches
 - To delete a **remote branch**
 ```
 git push origin --delete my-branch-name
@@ -199,7 +199,76 @@ git branch -d my-branch-name
 ```
 **NOTE:** The **-d** option only deletes the branch if it has already been merged. The **-D** option is a shortcut for --delete --force, which deletes the branch irrespective of its merged status.
 
-#### Change committer name/email
+### Check Project Repository History
+```shell
+$ git log --graph --all --oneline --decorate
+```
+or
+```shell
+$ git log --pretty=oneline --abbrev-commit
+```
+
+### Undo a commit & redo
+```shell
+$ git reset HEAD~                              # (1)
+[ edit files as necessary ]                    # (2)
+$ git add .                                    # (3)
+$ git commit -c ORIG_HEAD                      # (4)
+```
+1. `git reset` is the command responsible for the undo. It will undo your last commit while leaving your working tree (the state of your files on disk) untouched. You'll need to add them again before you can commit them again).
+2. Make corrections to working tree files.
+3. `git add` anything that you want to include in your new commit.
+4. Commit the changes, reusing the old commit message. `reset` copied the old head to `.git/ORIG_HEAD`; `commit` with `-c ORIG_HEAD` will open an editor, which initially contains the log message from the old commit and allows you to edit it. If you do not need to edit the message, you could use the `-C` option.
+
+**Alternatively, to edit the previous commit (or just its commit message),** `commit --amend` will add changes within the current index to the previous commit.
+
+**To remove (not revert) a commit that has been pushed to the server,** rewriting history with `git push origin main --force[-with-lease]` is necessary. It's almost always a bad idea to use `--force`; prefer `--force-with-lease` instead.
+
+`HEAD~` is the same as `HEAD~1`. The article [What is the HEAD in git?](https://stackoverflow.com/a/46350644/5175709) is helpful if you want to uncommit multiple commits.
+
+### Local remove commit
+```shell
+$ git reset --hard <commit-hash>
+```
+Or delete second commit line and save it
+```shell
+$ git rebase -i HEAD~2
+```
+
+### Remote remove commit
+```shell
+$ git push -f origin branch
+```
+git push --force <remote> <commit-ish>:<the remote branch>
+```shell
+$ git push --force origin 606fdfaa33af1844c86f4267a136d4666e576cdc:master
+```
+
+If you get the error:
+*error: Your local changes to the following files would be overwritten by checkout:*
+...
+Please commit your changes or stash them before you switch branches
+
+Then you can stash your work, create a new branch, then pop your stash changes, and resolve the conflicts:
+```shell
+$ git stash
+$ git checkout -b branch_name
+$ git stash pop
+
+$ git reset --soft <commit-id>
+$ git stash save "message"
+$ git reset --hard <commit-id>
+$ git stash apply stash stash@{0}
+$ git push --force
+
+$ git merge <commit-id>
+```
+Delete remote branch:
+```shell
+$ git push -d origin <branch_name>
+```
+
+### Change committer name/email
 1. Fix the git configuration (local) :
 ```shell
 $ git config --global user.name "Your-name"
@@ -252,6 +321,31 @@ $ git rebase --continue
 $ git push --force
 ```
 
+### Git extension for versioning large files
+#### Download Git Large File Storage
+**Download:** [https://git-lfs.github.com/](https://git-lfs.github.com/)
+**Homebrew:** `brew install git-lfs`
+**MacPorts:** `port install git-lfs`
+
+1. Download and install the Git command line extension.
+```shell
+$ git lfs install
+```
+2. Use Git LFS to configure additional file extensions (or directly edit your .gitattributes).
+```shell
+$ git lfs track "*.bin"
+```
+Now make sure .gitattributes is tracked:
+```shell
+$ git add .gitattributes
+```
+3. Commit and push to GitHub as you normally would
+```shell
+$ git add file.bin
+$ git commit -m "Add large binary file"
+$ git push origin main
+```
+
 ## Credits
 - [Comparing Workflows](https://www.atlassian.com/git/tutorials/comparing-workflows)
 - [Git Concepts - Quick Start Guides](https://www.gitkraken.com/learn/git/git-flow)
@@ -261,13 +355,32 @@ $ git push --force
 - [Git Commit Good Practice](https://wiki.openstack.org/wiki/GitCommitMessages) *(Best of the Best Examples)*
 - [Commit Message Guidelines](https://gist.github.com/robertpainsi/b632364184e70900af4ab688decf6f53)
 - [How can I change the author name / email of a commit?](https://www.git-tower.com/learn/git/faq/change-author-name-email/)
+- [How to change a Git commit message after a push](https://www.educative.io/edpresso/how-to-change-a-git-commit-message-after-a-push)
 
 ## Other Links
+- [x] https://github-readme-stats.vercel.app/api/top-langs/?username=superoutput&layout=compact&langs_count=7&hide=Jupyter%20Notebook
+- [x] https://github.com/frohoff/ysoserial
+- [x] https://github.com/for-GET/know-your-http-well/blob/master/methods.md
 - [x] https://medium.com/20scoops-cnx/github-workflow-from-scratch-99b07e8c318b
 - [x] https://www.nobledesktop.com/learn/git/git-branches
+- [x] https://stackoverflow.com/questions/8981194/changing-git-commit-message-after-push-given-that-no-one-pulled-from-remote
 - [ ] https://opensource.com/article/20/7/git-best-practices
 - [ ] https://docs.gitlab.com/ee/topics/gitlab_flow.html
 - [ ] https://www.freecodecamp.org/news/writing-good-commit-messages-a-practical-guide/
 - [ ] https://medium.com/@mingloan/managing-a-better-git-workflow-556281520e1a
 - [ ] https://www.cloudbees.com/blog/branching-strategy/
 - [ ] https://www.saladpuk.com/basic/git/branching-strategy
+- [ ] https://devconnected.com/how-to-push-git-branch-to-remote/
+- [ ] https://www.atlassian.com/git/tutorials/comparing-workflows
+- [ ] https://guides.github.com/introduction/flow/
+- [ ] https://github.com/andela/bestpractices/wiki/Git-Workflow
+- [ ] https://github.com/asmeurer/git-workflow
+- [ ] https://gist.github.com/vlandham/3b2b79c40bc7353ae95a
+- [ ] https://medium.com/@rieckpil/30-minutes-every-day-for-your-craft-committing-code-to-github-for-365-consecutive-days-eec8b73b5105
+- [ ] https://medium.com/mop-developers/the-subtle-discipline-of-daily-commits-f91136f0ed01
+- [ ] https://github.com/trein/dev-best-practices/wiki/Git-Commit-Best-Practices
+- [ ] https://sethrobertson.github.io/GitBestPractices/
+- [ ] https://stackoverflow.com/questions/53213341/git-commit-daily-or-commit-when-feature-is-completed
+- [ ] https://stackoverflow.com/questions/3817967/correct-git-workflow-for-shared-feature-branch
+- [ ] https://www.freecodecamp.org/news/lessons-from-my-month-long-github-commit-streak-b8f3167d34ac/
+- [ ] https://stackoverflow.com/questions/804115/when-do-you-use-git-rebase-instead-of-git-merge/804178#804178
