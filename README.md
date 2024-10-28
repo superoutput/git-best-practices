@@ -346,6 +346,34 @@ $ git commit -m "Add large binary file"
 $ git push origin main
 ```
 
+## Trobleshoots
+- [x] When you copy a Git project from external storage to your computer and find that all files are marked as modified, it can be perplexing. Here’s how to troubleshoot and resolve the issue:
+1. Check Line Endings
+
+**Line Endings Issue:** Different operating systems use different line endings (LF vs. CRLF). If the project was created on a Unix-like system and copied to Windows (or vice versa), this can cause all files to show as modified.
+**Solution:**
+- Set up `.gitattributes` in your repository to enforce consistent line endings. For example:
+```
+* text=auto
+```
+
+- Use Git's configuration to handle line endings:
+```
+git config --global core.autocrlf true  # For Windows
+git config --global core.autocrlf input  # For macOS/Linux
+```
+
+2. File Permissions
+**File Permissions:** When transferring files, permissions can change, especially between different filesystems.
+**Solution:**
+- If permissions are the issue, you might need to reset them.
+```shell
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+```
+
+
+
 ## Credits
 - [Comparing Workflows](https://www.atlassian.com/git/tutorials/comparing-workflows)
 - [Git Concepts - Quick Start Guides](https://www.gitkraken.com/learn/git/git-flow)
